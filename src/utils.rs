@@ -24,16 +24,20 @@ pub fn translate_sequence(dna_sequence: &str) -> Result<String, Box<dyn Error>> 
         .into());
     }
 
-    let mut i = start_index.unwrap();
+    let mut i = start_index.unwrap(); // From ATG
 
+    // Loop through the sequence in steps of codon size until the end
     while i + 3 <= dna_sequence.len() {
-        let codon = &dna_sequence[i..i + 3];
-        let amino_acid = codon_table.get(codon).unwrap_or(&"X");
+        let codon = &dna_sequence[i..i + 3]; // Extract a codon
+        let amino_acid = codon_table.get(codon).unwrap_or(&"X"); // Look up amino acid for the codon. X should never happen.
+        
+        // Stop for stop codon
         if *amino_acid == "*" {
             break;
         }
+        
         aa_sequence.push_str(amino_acid);
-        i += 3;
+        i += 3; // Move to the next codon
     }
 
     Ok(aa_sequence)
