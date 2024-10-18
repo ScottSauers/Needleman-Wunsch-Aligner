@@ -1,3 +1,13 @@
+**Quick start:**
+The easiest way to run the program, including all spike protein alignments, is with the following command for MacOS (no installations necessary):
+```
+curl -L -o aligner.tar.gz https://github.com/ScottSauers/Needleman-Wunsch-Aligner/releases/download/v0.0.3/aligner-aarch64-apple-darwin.tar.gz && \
+curl -L -o analysis.tar.gz https://github.com/ScottSauers/Needleman-Wunsch-Aligner/releases/download/v0.0.3/analysis-aarch64-apple-darwin.tar.gz && \
+tar -xzf aligner.tar.gz && tar -xzf analysis.tar.gz && \
+mkdir -p target/release && mv aligner target/release/aligner && \
+chmod +x target/release/aligner analysis && ./analysis
+```
+
 **Project structure:**
 - `src/`
   - `aligner.rs`: The main aligner program for the Needleman-Wunsch algorithm.
