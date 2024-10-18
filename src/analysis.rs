@@ -78,7 +78,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Alignment with penalties for start/end gaps (With penalties for start/end gaps):");
     println!("Matches: {}", matches2);
     println!("Mismatches: {}", mismatches2);
-    println!("Gaps: {}", gaps2);
+    println!("Gaps, including unpenalized gaps: {}", gaps2);
     println!("Total Mismatches (including gaps): {}", total_mismatches2);
 
     println!("Finding alignment with free start/end gaps...");
