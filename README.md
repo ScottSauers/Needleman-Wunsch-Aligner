@@ -36,7 +36,7 @@ Example run:
 - `-u, --unpenalized`: Unpenalized start and end gaps. Omit for penalized.
 
 
-**Analysis**
+**Analysis:**
 
 The analysis script does some alignments automatically.
 
