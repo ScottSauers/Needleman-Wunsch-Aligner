@@ -172,6 +172,8 @@ fn check_and_download_file(file_path: &str) -> Result<(), Box<dyn Error>> {
 
 
 // Needleman-Wunsch algorithm, global and semi-global alignment
+// https://bio.libretexts.org/Bookshelves/Computational_Biology/Book%3A_Computational_Biology_-_Genomes_Networks_and_Evolution_(Kellis_et_al.)/03%3A_Rapid_Sequence_Alignment_and_Database_Search/3.03%3A_Global_alignment_vs._Local_alignment_vs._Semi-global_alignment
+// https://ocw.mit.edu/courses/6-096-algorithms-for-computational-biology-spring-2005/01f55f348ea1e95f7015bd1b40586012_lecture5.pdf
 fn needleman_wunsch(
     seq1: &str,
     seq2: &str,
@@ -201,17 +203,26 @@ fn needleman_wunsch(
 
     // Fill score and traceback matrices
     for i in 1..=m {
-        let c1 = seq1.chars().nth(i - 1).unwrap();
+        let c1 = seq1.chars().nth(i - 1).unwrap(); // Get the char from the first seq
         for j in 1..=n {
-            let c2 = seq2.chars().nth(j - 1).unwrap();
+            let c2 = seq2.chars().nth(j - 1).unwrap(); // Get the char from the 2nd seq
+            // Score for match or mismatch
             let match_mismatch = if c1 == c2 { match_score } else { mismatch_penalty };
+            
+            // Diagonal score, adding match/mismatch score to the diagonal element
             let diag_score = score_matrix[i - 1][j - 1] + match_mismatch;
-            let up_score = score_matrix[i - 1][j]
-                + if unpenalized_end_gaps && (i == m) { 0 } else { gap_penalty };
-            let left_score = score_matrix[i][j - 1]
-                + if unpenalized_end_gaps && (j == n) { 0 } else { gap_penalty };
+            
+            // Calculate score for moving up (gap in seq 2), penalize unless unpenalized end gap (which makes # of gaps potentially different from gaps with penalty)
+            let up_score = score_matrix[i - 1][j] + if unpenalized_end_gaps && (i == m) { 0 } else { gap_penalty };
+            
+            // Calculate score for moving left (gap in seq 1), penalize unless unpenalized end gap
+            let left_score = score_matrix[i][j - 1] + if unpenalized_end_gaps && (j == n) { 0 } else { gap_penalty };
+            
+            // Select the max score among diagonal, up, and left moves
             let max_score = diag_score.max(up_score).max(left_score);
             score_matrix[i][j] = max_score;
+            
+            // Set trace matrix with D for diagonal, U for up, and L for left
             if max_score == diag_score {
                 trace_matrix[i][j] = 'D'; // Diagonal
             } else if max_score == up_score {
@@ -239,31 +250,40 @@ fn needleman_wunsch(
     let mut j = start_j;
 
     while i > 0 || j > 0 {
+        // Diagonally move if characters match or mismatch
         if i > 0 && j > 0 && trace_matrix[i][j] == 'D' {
-            let c1 = seq1.chars().nth(i - 1).unwrap();
-            let c2 = seq2.chars().nth(j - 1).unwrap();
-            align1.push(c1);
+            let c1 = seq1.chars().nth(i - 1).unwrap(); // Get character from seq1
+            let c2 = seq2.chars().nth(j - 1).unwrap(); // Get character from seq2
+            align1.push(c1); // Add character from seq1 to align1
             align2.push(c2);
+            // Match symbol '|' if the characters are the same, else add mismatch 'x'
             if c1 == c2 {
                 alignment_visualization.push('|');
             } else {
                 alignment_visualization.push('x');
             }
+            // Move to previous diagonal position
             i -= 1;
             j -= 1;
-        } else if i > 0 && trace_matrix[i][j] == 'U' {
-            let c1 = seq1.chars().nth(i - 1).unwrap();
+        }
+        // Move up if there's a gap in seq2
+        else if i > 0 && trace_matrix[i][j] == 'U' {
+            let c1 = seq1.chars().nth(i - 1).unwrap(); // Get the character from seq1
             align1.push(c1);
-            align2.push('_');
-            alignment_visualization.push(' ');
-            i -= 1;
-        } else if j > 0 && trace_matrix[i][j] == 'L' {
+            align2.push('_'); // Add a gap '_' to align2
+            alignment_visualization.push(' '); // Space for gap
+            i -= 1; // Move up to previous row
+        }
+        // Move left if there's a gap in seq1
+        else if j > 0 && trace_matrix[i][j] == 'L' {
             let c2 = seq2.chars().nth(j - 1).unwrap();
             align1.push('_');
             align2.push(c2);
             alignment_visualization.push(' ');
-            j -= 1;
-        } else {
+            j -= 1; // Move left to previous column
+        }
+        // Exit
+        else {
             break;
         }
     }
