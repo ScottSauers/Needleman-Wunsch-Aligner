@@ -1,0 +1,19 @@
+[package]
+name = "aligner"
+version = "1.0.0"
+edition = "2018"
+
+[[bin]]
+name = "aligner"
+path = "src/aligner.rs"
+
+[[bin]]
+name = "analysis"
+path = "src/analysis.rs"
+
+[dependencies]
+clap = "4.5.20"
+reqwest = { version = "0.11.18", features = ["blocking", "rustls-tls"] }
+statrs = "0.15.0"
+assert_cmd = "2.0.8"
+predicates = "2.1.4"
